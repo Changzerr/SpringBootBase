@@ -5,6 +5,8 @@ package com.wx.app.config;/**
  */
 
 import com.wx.app.filter.JwtAuthenticationTokenFilter;
+import com.wx.app.handler.AccessDeniedHandlerImpl;
+import com.wx.app.handler.AuthenticationEntryPointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +32,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    @Autowired
+    private AccessDeniedHandlerImpl accessDeniedHandler;
+
+    @Autowired
+    private AuthenticationEntryPointImpl authenticationEntryPoint;
     //注入BCryptPasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -54,6 +61,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //允许跨越
         http.cors();
+
+        http.exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint);
     }
 
     @Bean
