@@ -7,6 +7,7 @@ package com.wx.app.service.impl;/**
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wx.app.entity.LoginUser;
 import com.wx.app.entity.User;
+import com.wx.app.mapper.MenuMapper;
 import com.wx.app.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserMapper userManager;
 
+    @Autowired
+    private MenuMapper menuManager;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
@@ -44,8 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         //TODO 权限查询
-        List<String> list = new ArrayList<>(Arrays.asList("test","admin"));
-
+        List<String> list = menuManager.selectPermsByUserId(user.getId());
         //封装为UserDetails
         return new LoginUser(user,list);
     }

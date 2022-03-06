@@ -2,6 +2,7 @@ package com.wx.app;
 
 import com.wx.app.entity.LoginUser;
 import com.wx.app.entity.User;
+import com.wx.app.mapper.MenuMapper;
 import com.wx.app.mapper.UserMapper;
 import com.wx.app.utils.RedisCache;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,16 @@ class AppApplicationTests {
         //$2a$10$UViL.jTzZHy/m7K29SuwPenDT5s5XcfIoSHoEJImRBjbsnok3Y7Nu
         System.out.println(ps.matches("1234",
                 "$2a$10$UViL.jTzZHy/m7K29SuwPenDT5s5XcfIoSHoEJImRBjbsnok3Y7Nu"));
+    }
+
+    @Autowired
+    private MenuMapper menuMapper;
+    @Test
+    public void testSelectPermsByUserId(){
+        List<String> list = menuMapper.selectPermsByUserId(2L);
+        for (String userId : list){
+            System.out.println(userId);
+        }
     }
 
 }
