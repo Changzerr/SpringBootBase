@@ -96,7 +96,7 @@ public class LoginServiceImpl implements LoginService {
         String passwordEncoder = ps.encode(user.getPassword());
         user.setPassword(passwordEncoder);
 
-        //得到执行人的id(如果可以自己注册则不需要这个)
+        //得到执行人的id(如果可以每个人注册则不需要这个，并且取消注册接口的拦截)
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         LoginUser principal = (LoginUser) authentication.getPrincipal();
         Long id = principal.getUser().getId();
