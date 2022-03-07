@@ -18,4 +18,5 @@ public interface LoginService {
 
     Result logout();
 
+    Result register(User user);
 }

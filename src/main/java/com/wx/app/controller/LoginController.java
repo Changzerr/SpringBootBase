@@ -31,6 +31,11 @@ public class LoginController {
         return loginService.login(user);
     }
 
+    @PostMapping("user/register")
+    public Result register(@RequestBody User user){
+        return loginService.register(user);
+    }
+
     @RequestMapping("user/logout")
     public Result logout(){
         return loginService.logout();

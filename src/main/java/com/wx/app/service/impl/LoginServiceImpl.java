@@ -4,8 +4,10 @@ package com.wx.app.service.impl;/**
  * @apiNote
  */
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wx.app.entity.LoginUser;
 import com.wx.app.entity.User;
+import com.wx.app.mapper.UserMapper;
 import com.wx.app.service.LoginService;
 import com.wx.app.utils.JwtUtil;
 import com.wx.app.utils.RedisCache;
@@ -15,6 +17,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -35,6 +39,8 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserMapper userManager;
     @Autowired
     private RedisCache redisCache;
 
@@ -72,5 +78,30 @@ public class LoginServiceImpl implements LoginService {
         //把redis中的登录信息删除
         redisCache.deleteObject("login:" + id);
         return new Result(200,"注销成功");
+    }
+
+    @Override
+    public Result register(User user) {
+
+        //判断用户名是否已经存在了
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUserName, user.getUserName());
+        User hasUser = userManager.selectOne(queryWrapper);
+        if (!Objects.isNull(hasUser)){
+            return new Result(403,"注册失败，该用户已存在");
+        }
+
+        //加密密码
+        PasswordEncoder ps = new BCryptPasswordEncoder();
+        String passwordEncoder = ps.encode(user.getPassword());
+        user.setPassword(passwordEncoder);
+
+        //得到执行人的id(如果可以自己注册则不需要这个)
+        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        LoginUser principal = (LoginUser) authentication.getPrincipal();
+        Long id = principal.getUser().getId();
+        user.setCreateBy(id);
+        userManager.insert(user);
+        return new Result(200,"注册成功");
     }
 }
